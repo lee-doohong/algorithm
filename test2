@@ -1,0 +1,120 @@
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import java.util.stream.Stream.Builder;
+import java.io.*;
+
+public class Main {
+	
+	static int N;
+	static long[] h;
+	
+	public static void main(String[] args) throws IOException {
+//		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+	
+		long result = 0;
+		
+		Scanner s = new Scanner(System.in);
+		N = s.nextInt();
+		if (N == 1) {
+			System.out.println(s.nextInt());
+			return;
+		}
+		
+		h = new long[N];//높이를 저장할 곳
+		
+		Stack<Integer> stack = new Stack<>();
+		
+		int tmp = 0;
+		
+		for (int i = 0 ; i < N; i++) {
+			System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			h[i] = s.nextInt();
+			System.out.println("stack : " + stack.toString());
+			System.out.println("h : " + Arrays.toString(h));
+			boolean flag = true;//기존에 들어 있는게 내것보다 작은 것이 있는경우 stack에서 탐색을 그만하는 용도로 사용한다.
+			if (stack.size() == 0) {//stack에 아무것도 안들어 있으면 하나 넣어준다
+				System.out.println("최초실행");
+				stack.push(i);
+			} else {
+				//일단 stack에 들어 있는 마지막 것보다 내가 더크면 그냥 집어 넣는다.
+				System.out.println("h[" + i +"] : " + h[i]);
+				if (h[stack.peek()] < h[i]) {
+					stack.push(i);
+				}
+				//그렇지 않은 경우에는 stack에 있는 것들을 빼줘야 한다.
+				else {
+					while(flag) {//stack안에서 현재수보다 높이가 작은수를 가르키는 index가 있는지 확인하고 있는 경우 빼서 넓이를 비교해주는 작업.
+						tmp = stack.pop();//일단 stack에서 하나 꺼낸다.
+						System.out.println("tmp : " + tmp);
+						if(stack.size() != 0) {//stack에 남은 것이 있는 경우
+							System.out.println("h[" + tmp+ "] * (i - 1 - stack.peek()) : " + h[tmp] * (i - 1 - stack.peek()));
+							result = Math.max(result, h[tmp] * (i - 1 - stack.peek()));//stack에 있는 그 다음 index 값 
+							System.out.println("result1 : " + result);
+						} else {
+							//stack에 남은 것이 없는 경우
+							System.out.println("h[" + tmp + "] * (" + tmp+"+1) : " + h[tmp] * i);
+							result = Math.max(result, h[tmp] * i);
+							System.out.println("result2 : " + result);
+						}
+						if (stack.size() != 0) { //stack size가 0이 아니라면
+							if (h[stack.peek()] < h[i]) {//하나 정리하고 그 다음은 stack에 들어 있는건 어떻게 되는지 확인//
+								stack.push(i);
+								flag = false;
+							}
+						} else {//stack size가 0이라면
+							stack.push(i);
+							flag = false;
+						}
+					}
+				}
+				
+			}
+		}
+		System.out.println("result : "  + result);
+		System.out.println("stack : " + stack.toString());
+		//남은 숫자들 정리를 해줘야 한다
+		boolean flag2 = true;
+		while(flag2) {//stack안에서 현재수보다 높이가 작은수를 가르키는 index가 있는지 확인하고 있는 경우 빼서 넓이를 비교해주는 작업.
+			tmp = stack.pop();//일단 stack에서 하나 꺼낸다.
+			System.out.println("tmp2 : " + tmp);
+			if(stack.size() != 0) {//stack에 남은 것이 있는 경우
+				result = Math.max(result, h[tmp] * (tmp - stack.peek()));//stack에 있는 그 다음 index 값 
+				System.out.println(h[tmp] * (tmp - stack.peek()));
+				System.out.println("result3 : " + result);
+			} else {
+				//stack에 남은 것이 없는 경우
+				result = Math.max(result, h[tmp] * N);
+				System.out.println(h[tmp] * N);
+				System.out.println("result4 : " + result);
+				flag2 = false;
+			}
+		}
+		System.out.println(result);
+	}
+}
+
+/**
+반례
+5 1 3 2 4 6
+
+0
+
+답: 8
+
+5 1 2 3 4 5
+
+0
+
+답: 9
+
+4 0 1 2 3
+
+0
+
+답: 4
+
+
+**/
